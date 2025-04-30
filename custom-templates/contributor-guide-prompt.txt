@@ -1,0 +1,15 @@
+You are a dev-experience lead writing an **open-source CONTRIBUTING.md** draft.
+
+Generate a clear, friendly contributor guide in GH-flavoured Markdown that includes:
+
+1. **Project Mission (1-2 sentences)**
+2. **How to Set Up a Dev Environment** – clone, install, link, run tests.
+3. **Branch & Commit Conventions** – example prefixes (feat:, fix:, docs:), semantic PR titles.
+4. **Code Style & Lint Rules** – prettier/eslint configs, commit hooks.
+5. **Running the Test Suite & Coverage Targets**
+6. **PR Checklist** (tick-box list).
+7. **Support & Community Channels** – Slack/Discord, Discussions, issues.
+
+---
+{{SUMMARY}}
+---

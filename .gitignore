@@ -138,5 +138,5 @@ dist
 # package-lock ignore
 package-lock.json
 
-# custom templates folder
-custom-templates/
+# secret templates folder
+secret-templates/

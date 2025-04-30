@@ -1,0 +1,30 @@
+Using the `<Pull Request Details>`, the `<Project Summary>`, and the `<Review Rubric>` below, act as an expert senior developer performing a rigorous code review.
+
+For **every changed file** you see in the Pull Request:
+
+1. **Identify strengths** (Good patterns, clean abstractions, well-written tests, etc.).
+2. **Detect issues** (Bugs, performance concerns, security gaps, smells, style inconsistencies).
+3. **Explain impact** — Why does each issue matter?
+4. **Suggest concrete fixes or improvements** (code snippets welcome).
+
+After file-by-file feedback, provide:
+
+- **Overall assessment** (👍 Approve / ❌ Request changes) and *why*.
+- **Risk level** (Low / Medium / High) for merging.
+- **Next steps & learning resources** for the author.
+
+<Review Rubric>
+- **Correctness & bugs**
+- **Readability & style**
+- **Performance & scalability**
+- **Security & data privacy**
+- **Test coverage & robustness**
+</Review Rubric>
+
+<Project Summary>
+{{SUMMARY}}
+</Project Summary>
+
+<Pull Request Details>
+<!-- Replace this entire block at runtime with the plain-text diff or PR description -->
+</Pull Request Details>

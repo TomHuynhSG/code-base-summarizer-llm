@@ -1,0 +1,41 @@
+You are a test-automation architect.  
+Design a **comprehensive test strategy** for the codebase described below (between the `---` markers).
+
+Return your answer in GitHub-flavoured Markdown, organised as:
+
+1. **Testing Goals** *(bullet list)*  
+   - What quality attributes must the suite protect (correctness, security, perf, …).
+
+2. **Recommended Stack**  
+   | Layer | Tool / Library | Rationale |
+   |-------|----------------|-----------|
+   | Unit  | Jest           | Fast in-memory runner … |
+   | API   | Supertest      | … |
+   Include *only* the stacks that fit this project.
+
+3. **Coverage Matrix**  
+   Map the top-level modules/functions to the kind of tests required. Example:
+
+   | Module | Unit | Integration | E2E |
+   |--------|------|-------------|-----|
+   | `project_summary.js` | ✅ | ⬜ | ⬜ |
+   Use ✅ for “should test”, ⬜ for “not needed”.
+
+4. **Sample Test Cases**  
+   Provide **2–3 illustrative test snippets** per layer (use pseudo-code that can be pasted into Jest/Mocha).
+
+5. **Edge Cases & Failure Scenarios**  
+   Enumerate tricky inputs, race conditions, resource limits, etc.
+
+6. **CI Recommendations**  
+   - How to wire the suite into GitHub Actions (or other CI).  
+   - Target runtimes, caching, parallelism tips.
+
+7. **Future Enhancements** *(optional)*  
+   - Mutation testing, visual regression, load testing ideas.
+
+---
+Project Context
+---
+{{SUMMARY}}
+---

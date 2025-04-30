@@ -1,0 +1,17 @@
+You are an application-security engineer performing a **lightweight threat assessment**.
+
+Using the project details between the `---` lines, produce a report in GitHub-flavoured Markdown with:
+
+1. **Executive Summary** – 2-3 sentences on overall risk posture.
+2. **Asset Inventory** (bullet list) – code modules, secrets, 3rd-party services worth protecting.
+3. **Findings & Severity**  
+   | Risk | Location | Impact | Likelihood | Mitigation |
+   |------|----------|--------|------------|------------|
+   | 🟥 High | `llm_processor.js` | Plain-text API key … | Likely | … |
+   Use 🟥 High / 🟧 Medium / 🟨 Low.
+4. **Secure-by-Design Recommendations** – framework, dependencies, config hardening, secrets management, SBOM, etc.
+5. **Next Steps & References** – links to OWASP docs, tooling (Snyk, Semgrep), policies.
+
+---
+{{SUMMARY}}
+---
