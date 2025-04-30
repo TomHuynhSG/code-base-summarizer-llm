@@ -166,7 +166,7 @@ When using `--llm`:
 * The raw summary is *not* copied to the clipboard by default (use `--copy` to force it).
 
 <p align="center">
-  <img width="450" src="https://i.imgur.com/8rCR50h.png">
+  <img width="450" src="https://i.imgur.com/8LeMf48.png">
 </p>
 
 ### LLM Options

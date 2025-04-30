@@ -54,15 +54,6 @@ const NON_TEXT_EXTENSIONS = new Set([
     '.xcodeproj', '.xcworkspace', // Xcode project files
     '.apk', // Android package files
     '.ipa', // iOS package files
-    '.appx', // Windows app package files
-    '.appxbundle', // Windows app bundle files
-    '.appxupload', // Windows app upload files
-    '.appxsym', // Windows app symbol files
-    '.appxmanifest', // Windows app manifest files
-    '.appxrecipe', // Windows app recipe files
-    '.appxblockmap', // Windows app block map files
-    '.appxsignature', // Windows app signature files
-    '.appxmetadata', // Windows app metadata files
 ]);
 
 // --- Helper Functions ---
