@@ -1,4 +1,4 @@
-# Codebase Summarizer CLI
+# Codebase Summarizer CLI LLM
 
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D18.0.0-green?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![CLI](https://img.shields.io/badge/-CLI-blueviolet?logo=cli&logoColor=white)](https://en.wikipedia.org/wiki/Command-line_interface)
