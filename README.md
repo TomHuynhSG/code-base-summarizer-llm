@@ -165,6 +165,10 @@ When using `--llm`:
 * The HTML report is automatically opened in your default browser.
 * The raw summary is *not* copied to the clipboard by default (use `--copy` to force it).
 
+<p align="center">
+  <img width="450" src="https://i.imgur.com/8rCR50h.png">
+</p>
+
 ### LLM Options
 
 You can customize the LLM processing using the following options with the `--llm` flag:
