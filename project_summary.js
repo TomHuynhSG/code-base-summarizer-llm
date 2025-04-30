@@ -28,7 +28,13 @@ const IGNORED_FILES = new Set([
     'yarn.lock', 'pnpm-lock.yaml', // Node.js
     'composer.lock', // PHP
     'Package.resolved', // SwiftPM
-    'terraform.tfstate', 'terraform.tfstate.backup' // Terraform
+    'terraform.tfstate', 'terraform.tfstate.backup', // Terraform
+    'LICENSE', 'LICENSE.txt', // Common license files,
+    'CHANGELOG.md', 'CHANGELOG.txt', // Common changelog files
+    'CONTRIBUTING.md', 'CONTRIBUTING.txt', // Common contributing files
+    'CODE_OF_CONDUCT.md', 'CODE_OF_CONDUCT.txt', // Common code of conduct files
+    'SECURITY.md', 'SECURITY.txt', // Common security files
+    'README.md', 'README.txt', // Common documentation files (This is a bit controversial, but README files are often too long and to be input to LLMs)
 ]);
 const NON_TEXT_EXTENSIONS = new Set([
     '.png', '.jpg', '.jpeg', '.gif', '.bmp', '.svg', '.ico', '.webp', // Images

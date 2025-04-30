@@ -55,13 +55,13 @@ async function main() {
         .option('model', {
             alias: 'm',
             type: 'string',
-            default: 'gpt-4o', // Or 'gpt-3.5-turbo' or another preferred model
+            default: 'gpt-4o', // Or 'o4-mini', 'gpt-4.1-mini' or 'gpt-4o' or another preferred model
             description: 'OpenAI model name to use for LLM processing.'
         })
         .option('temperature', {
             alias: 't',
             type: 'number',
-            default: 0.7,
+            default: 1,
             description: 'Temperature setting for the LLM (0.0 to 2.0).'
         })
         .option('copy', {
