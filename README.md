@@ -5,7 +5,7 @@
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
 
 <p align="center">
-  <img width="350" src="https://i.imgur.com/Ht6rVQ4.png">
+  <img width="450" src="https://i.imgur.com/Ht6rVQ4.png">
 </p>
 
 A powerful command-line interface (CLI) tool designed to quickly scan a project directory, generate a clean, structured report of its contents (folder tree + text file content), and optionally pass this report to an LLM for analysis, rendering the result in a local web page.
