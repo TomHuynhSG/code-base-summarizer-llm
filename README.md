@@ -149,7 +149,7 @@ These lists are quite comprehensive and cover many typical project setups, ensur
 Contributions are welcome\! If you have suggestions for improvements, bug fixes, or want to add more file/directory patterns to the ignore lists, feel free to open an issue or submit a pull request.
 
 1.  Fork the repository.
-2.  Clone your fork: `git clone https://github.com/your-username/summarize-code-base.git`
+2.  Clone your fork: `git clone https://github.com/TomHuynhSG/summarize-code-base.git`
 3.  Install dependencies: `npm install`
 4.  Link the package for local testing: `npm link` (You can now use `summarize` in your terminal from any directory, pointing to your local code)
 5.  Make your changes.
