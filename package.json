@@ -1,0 +1,28 @@
+{
+    "name": "summarize-code-base",
+    "version": "1.2.0",
+    "description": "A CLI tool to scan a project directory, generate a summary report (structure + text files), and copy it to the clipboard.",
+    "main": "project_summary.js",  "bin": {
+      "summarize": "./project_summary.js"  },
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+      "cli",
+      "code",
+      "summary",
+      "report",
+      "filesystem",
+      "scan",
+      "clipboard"
+    ],
+    "author": "Your Name or Org",
+    "license": "ISC",
+    "dependencies": {
+      "yargs": "^17.7.2",
+      "clipboardy": "^4.0.0"
+    },
+    "engines": {
+      "node": ">=14.0.0"
+    }
+  }
