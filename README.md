@@ -157,5 +157,18 @@ Contributions are welcome\! If you have suggestions for improvements, bug fixes,
 7.  Commit your changes and push to your fork.
 8.  Create a pull request to the original repository.
 
+
+## 🗺️ Future Enhancements / Roadmap
+
+Here are some planned features and potential future directions for the `summarize-code-base` tool:
+
+* **Custom Ignore Patterns:** Allow users to specify additional files, directories, or patterns to ignore via command-line arguments or a configuration file (e.g., `.summarizerc`).
+* **Multiple Output Formats:** Add options to output the summary in different formats (e.g., Markdown, JSON) in addition to the current plain text format.
+* **Output to File:** Implement an option to save the generated report directly to a specified file instead of just printing to the console and clipboard.
+* **Integrate with Local LLM (Concept):** Explore connecting with local Large Language Models (LLMs) or APIs to potentially provide a higher-level summary or insights based on the generated project report.
+* **Integrate with Vision LLM for Images (Concept):** Investigate using local Vision-Language Models (VLMs) to analyze image files (currently ignored) and generate text descriptions of their content, which could then be included in the report.
+* **Progress Indicator:** For large projects, add a visual indicator to show the scanning progress.
+
+
 ## 🏆 Author
 - Huynh Nguyen Minh Thong (Tom Huynh) - tomhuynhsg@gmail.com
