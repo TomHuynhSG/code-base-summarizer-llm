@@ -19,7 +19,8 @@ const IGNORED_DIRS = new Set([
     '.nyc_output', // Node.js coverage
     '.build', 'Pods', '.swiftpm', 'xcuserdata', '.xcworkspace', // Swift/SwiftUI
     '.terraform', '.vagrant', // DevOps tools
-    '.circleci' // CI config cache/logs
+    '.circleci', // CI config cache/logs,
+    '.github', // GitHub Actions cache/logs
 ]);
 const IGNORED_FILES = new Set([
     'package-lock.json', // Node.js
@@ -34,7 +35,7 @@ const IGNORED_FILES = new Set([
     'CONTRIBUTING.md', 'CONTRIBUTING.txt', // Common contributing files
     'CODE_OF_CONDUCT.md', 'CODE_OF_CONDUCT.txt', // Common code of conduct files
     'SECURITY.md', 'SECURITY.txt', // Common security files
-    'README.md', 'README.txt', // Common documentation files (This is a bit controversial, but README files are often too long and to be input to LLMs)
+    //'README.md', 'README.txt', // Common documentation files (This is a bit controversial, but README files are often too long and to be input to LLMs)
 ]);
 const NON_TEXT_EXTENSIONS = new Set([
     '.png', '.jpg', '.jpeg', '.gif', '.bmp', '.svg', '.ico', '.webp', // Images
@@ -44,7 +45,24 @@ const NON_TEXT_EXTENSIONS = new Set([
     '.ttf', '.otf', '.woff', '.woff2', '.eot', // Fonts
     '.DS_Store', // macOS specific
     '.map', // Source maps (js, css, etc.)
-    '.sqlite3', '.db' // Common database files
+    '.sqlite3', '.db', // Common database files,
+    '.lock', // Common lock files (e.g., for package managers)
+    '.iml', // IntelliJ IDEA module files
+    '.sublime-project', '.sublime-workspace', // Sublime Text project files
+    '.idea', // IntelliJ IDEA project files
+    '.classpath', '.project', // Eclipse project files
+    '.xcodeproj', '.xcworkspace', // Xcode project files
+    '.apk', // Android package files
+    '.ipa', // iOS package files
+    '.appx', // Windows app package files
+    '.appxbundle', // Windows app bundle files
+    '.appxupload', // Windows app upload files
+    '.appxsym', // Windows app symbol files
+    '.appxmanifest', // Windows app manifest files
+    '.appxrecipe', // Windows app recipe files
+    '.appxblockmap', // Windows app block map files
+    '.appxsignature', // Windows app signature files
+    '.appxmetadata', // Windows app metadata files
 ]);
 
 // --- Helper Functions ---

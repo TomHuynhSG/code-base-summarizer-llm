@@ -55,7 +55,7 @@ async function main() {
         .option('model', {
             alias: 'm',
             type: 'string',
-            default: 'gpt-4o', // Or 'o4-mini', 'gpt-4.1-mini' or 'gpt-4o' or another preferred model
+            default: 'o4-mini', // Or 'o4-mini', 'gpt-4.1-mini' or 'gpt-4o' or another preferred model
             description: 'OpenAI model name to use for LLM processing.'
         })
         .option('temperature', {

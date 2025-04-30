@@ -18,6 +18,7 @@ Follow the outline below and keep each section tight but informative:
 3. **Architecture & Data Flow**
    - Narrative of how control and data move from entry point to exit.  
    - If non-trivial, add a simple Mermaid diagram (`flowchart TD`) to illustrate.
+   - Double check always if the Mermaid syntax you generated correct or not! If not, then fix it right away!
 
 4. **Key Modules / Packages**
    | Path | Responsibility | Public APIs / Entry Points |
