@@ -165,6 +165,8 @@ When using `--llm`:
 * The HTML report is automatically opened in your default browser.
 * The raw summary is *not* copied to the clipboard by default (use `--copy` to force it).
 
+*Here is an example of applying this project summarizer on this Github repo (recursive???) and display the summary website with diagrams and tables:*  
+
 <p align="center">
   <img width="450" src="https://i.imgur.com/8LeMf48.png">
 </p>
