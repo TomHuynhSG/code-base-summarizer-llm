@@ -20,7 +20,7 @@ const IGNORED_DIRS = new Set([
     '.build', 'Pods', '.swiftpm', 'xcuserdata', '.xcworkspace', // Swift/SwiftUI
     '.terraform', '.vagrant', // DevOps tools
     '.circleci', // CI config cache/logs,
-    '.github', // GitHub Actions cache/logs
+    '__MACOSX', // macOS specific
 ]);
 const IGNORED_FILES = new Set([
     'package-lock.json', // Node.js
@@ -35,6 +35,7 @@ const IGNORED_FILES = new Set([
     'CONTRIBUTING.md', 'CONTRIBUTING.txt', // Common contributing files
     'CODE_OF_CONDUCT.md', 'CODE_OF_CONDUCT.txt', // Common code of conduct files
     'SECURITY.md', 'SECURITY.txt', // Common security files
+    '.DS_Store', // macOS specific
     //'README.md', 'README.txt', // Common documentation files (This is a bit controversial, but README files are often too long and to be input to LLMs)
 ]);
 const NON_TEXT_EXTENSIONS = new Set([
