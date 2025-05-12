@@ -16,8 +16,8 @@ A powerful command-line interface (CLI) tool designed to quickly scan a project 
 * **Text File Contents:** Includes the full content of identifiable text files within the project.
 * **Intelligent Filtering:** Automatically ignores common directories (`node_modules`, `.git`, `dist`, build/cache folders, virtual environments, etc.) and specific noisy files (`package-lock.json`, `.env`, lock files, etc.).
 * **Binary/Non-Text Exclusion:** Skips binary files, images, archives, media, and other non-text formats (unless specific parsers are available, like for PDF and Word documents).
-* **PDF Scanning:** Extracts text from PDF files using Docling (or PyPDF2 fallback) for comprehensive codebase analysis.
-* **Word Document Scanning:** Extracts text from Microsoft Word documents (`.docx` and `.doc` files).
+* **PDF Scanning:** Extracts text from PDF files using the `pdf-parse` Node.js library.
+* **Word Document Scanning:** Extracts text from Microsoft Word documents (`.docx` using `mammoth` and `.doc` using `doc-parser`).
 * **Optional LLM Integration:** Pass the generated summary directly to an OpenAI-compatible LLM API for automated analysis using the `--llm` flag.
 * **Customizable Prompting:** Use a template file (`--prompt`) to control the instructions given to the LLM, injecting the project summary using a special tag (`{{SUMMARY}}`).
 * **Configurable LLM Settings:** Easily adjust the LLM `model` and `temperature` via command-line options.
@@ -95,20 +95,7 @@ This tool is a Node.js CLI application. You will need Node.js installed on your 
     **Troubleshooting:**
     If you encounter a "Cannot find module" error when running the `summarize` command, make sure you've installed the dependencies first with `npm install` before installing the package globally.
 
-3.  **Setup for PDF Scanning (Optional):**
-    If you want to enable PDF scanning with Docling, you need to install Python and Docling:
-    * Install Python from [python.org](https://www.python.org/downloads/) if not already installed.
-    * Install Docling using pip:
-        ```bash
-        pip install docling
-        ```
-    * If Docling is not available, the tool will attempt to use PyPDF2 as a fallback:
-        ```bash
-        pip install PyPDF2
-        ```
-    * Note: Without either of these packages, PDF files will be skipped or show an error message.
-
-4.  **Setup for LLM Integration (Optional):**
+3.  **Setup for LLM Integration (Optional):**
     If you plan to use the `--llm` functionality with OpenAI, you need an API key.
     * Get your OpenAI API key from the [OpenAI Platform API Keys page](https://platform.openai.com/api-keys).
     * In the directory where you installed the `summarize-code-base` code (if you cloned it), or in your project's root directory where you might run the command from, create a file named `.env`.
@@ -304,7 +291,7 @@ The tool comes with built-in lists of common directories and files to ignore, de
 
 * `IGNORED_DIRS`: Contains directories like `node_modules`, `.git`, `dist`, build/cache folders for various languages/frameworks, virtual environments (`venv`, `env`), etc.
 * `IGNORED_FILES`: Contains specific file names like `package-lock.json`, `.env`, `.env.local`, and various lock files (`poetry.lock`, `yarn.lock`, `composer.lock`, etc.).
-* `NON_TEXT_EXTENSIONS`: Contains file extensions for binary files, images, archives, media, databases, fonts, etc. (Note: PDF files are now processed using Docling or PyPDF2 if available)
+* `NON_TEXT_EXTENSIONS`: Contains file extensions for binary files, images, archives, media, databases, fonts, etc. (Note: PDF files are processed using the `pdf-parse` library).
 
 These lists are quite comprehensive and cover many typical project setups.
 
@@ -327,43 +314,18 @@ Contributions are welcome! If you have suggestions for improvements, bug fixes, 
 
 ### PDF Processing
 
-The tool now supports scanning PDF files using [Docling](https://github.com/docling-project/docling), a powerful document processing library. When a PDF file is encountered:
+The tool processes PDF files using the [pdf-parse](https://www.npmjs.com/package/pdf-parse) Node.js library. This library is included as a project dependency and installed automatically when you run `npm install`. No separate Python or external tool installation is required for PDF handling.
 
-1. The tool first checks if Docling is installed and available.
-2. If Docling is available, it uses it to extract text from the PDF, preserving structure and formatting.
-3. If Docling is not available or returns empty output, it automatically falls back to PyPDF2.
-4. If neither is available, it will display an error message with installation instructions.
-
-PDF processing capabilities include:
-* Advanced PDF understanding including page layout and reading order
-* Table structure extraction
-* Code block recognition
-* Formula extraction
-* OCR support for scanned PDFs
-
-To get the best results with PDF files:
-```bash
-# Install Docling (primary PDF processor)
-pip install docling
-
-# Install PyPDF2 (fallback PDF processor)
-pip install PyPDF2
-```
-
-The tool will automatically detect which PDF processing libraries are available and use the best option. If you see a message like "Docling not found. PDF scanning will be limited," you can install Docling to enable enhanced PDF processing capabilities.
+When a PDF file is encountered, `pdf-parse` attempts to extract its text content. The extracted text is included in the summary report.
 
 ### Word Document Processing
 
-The tool now supports scanning Microsoft Word documents:
+The tool supports scanning Microsoft Word documents using Node.js libraries:
 
-*   **`.docx` files:** Text is extracted using the `mammoth` library, which is specifically designed for converting `.docx` documents to plain text. This library is included as a project dependency.
-*   **`.doc` files (Legacy Word Format):** Text is extracted using the `textract` library. This library is also included as a project dependency.
-    *   **Important Note for `.doc` files:** `textract` often relies on external command-line tools to process older `.doc` files. You may need to install `antiword` or `catdoc` on your system.
-        *   On macOS (using Homebrew): `brew install antiword`
-        *   On Debian/Ubuntu: `sudo apt-get install antiword` or `sudo apt-get install catdoc`
-        *   If text extraction from `.doc` files fails or returns an error, please ensure one of these helper tools is installed and accessible in your system's PATH.
+*   **`.docx` files:** Text is extracted using the `mammoth` library.
+*   **`.doc` files (Legacy Word Format):** Text is extracted using the `doc-parser` library.
 
-The necessary Node.js libraries (`mammoth` and `textract`) are listed in `package.json` and will be installed automatically when you run `npm install` in the project directory.
+Both `mammoth` and `doc-parser` are included as project dependencies in `package.json` and will be installed automatically when you run `npm install`. No external tools are required for Word document processing anymore. Note that the reliability of `.doc` parsing might vary compared to `.docx`.
 
 ## 🗺️ Future Enhancements / Roadmap
 

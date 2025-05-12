@@ -25,12 +25,14 @@
     "license": "ISC",
     "dependencies": {
         "clipboardy": "^4.0.0",
+        "doc-parser": "^0.4.9",
         "dotenv": "^16.0.0",
         "express": "^4.19.2",
         "mammoth": "^1.9.0",
         "marked": "^12.0.0",
         "open": "^10.1.0",
         "openai": "^4.0.0",
+        "pdf-parse": "^1.1.1",
         "textract": "^2.5.0",
         "yargs": "^17.7.2"
     },
