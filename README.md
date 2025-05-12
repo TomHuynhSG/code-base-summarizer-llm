@@ -63,10 +63,23 @@ This tool is a Node.js CLI application. You will need Node.js installed on your 
     Make sure the Node.js version is 18.0.0 or higher.
 
 2.  **Install the CLI Tool:**
-    Once Node.js and npm (Node Package Manager) are installed, you can install the `summarize-code-base` package globally using npm. This makes the `summarize` command available in your terminal from any directory.
+    Once Node.js and npm (Node Package Manager) are installed, you can install the package globally. This makes the `summarize` command available in your terminal from any directory.
 
+    **Option A: Install from local directory (recommended):**
+    If you have cloned or downloaded this repository, navigate to the project directory and run:
+    ```bash
+    npm install -g .
+    ```
+    
+    **Option B: Install from npm registry:**
+    If the package has been published to npm (not available yet), you can install it directly:
     ```bash
     npm install -g summarize-code-base
+    ```
+    
+    **Note for macOS/Linux users:** You might need to use `sudo` if you encounter permission errors:
+    ```bash
+    sudo npm install -g .
     ```
 
 3.  **Setup for LLM Integration (Optional):**
