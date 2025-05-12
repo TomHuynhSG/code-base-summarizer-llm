@@ -16,6 +16,7 @@ A powerful command-line interface (CLI) tool designed to quickly scan a project 
 * **Text File Contents:** Includes the full content of identifiable text files within the project.
 * **Intelligent Filtering:** Automatically ignores common directories (`node_modules`, `.git`, `dist`, build/cache folders, virtual environments, etc.) and specific noisy files (`package-lock.json`, `.env`, lock files, etc.).
 * **Binary/Non-Text Exclusion:** Skips binary files, images, archives, media, and other non-text formats.
+* **PDF Scanning:** Extracts text from PDF files using Docling for comprehensive codebase analysis.
 * **Optional LLM Integration:** Pass the generated summary directly to an OpenAI-compatible LLM API for automated analysis using the `--llm` flag.
 * **Customizable Prompting:** Use a template file (`--prompt`) to control the instructions given to the LLM, injecting the project summary using a special tag (`{{SUMMARY}}`).
 * **Configurable LLM Settings:** Easily adjust the LLM `model` and `temperature` via command-line options.
@@ -93,7 +94,20 @@ This tool is a Node.js CLI application. You will need Node.js installed on your 
     **Troubleshooting:**
     If you encounter a "Cannot find module" error when running the `summarize` command, make sure you've installed the dependencies first with `npm install` before installing the package globally.
 
-3.  **Setup for LLM Integration (Optional):**
+3.  **Setup for PDF Scanning (Optional):**
+    If you want to enable PDF scanning with Docling, you need to install Python and Docling:
+    * Install Python from [python.org](https://www.python.org/downloads/) if not already installed.
+    * Install Docling using pip:
+        ```bash
+        pip install docling
+        ```
+    * If Docling is not available, the tool will attempt to use PyPDF2 as a fallback:
+        ```bash
+        pip install PyPDF2
+        ```
+    * Note: Without either of these packages, PDF files will be skipped or show an error message.
+
+4.  **Setup for LLM Integration (Optional):**
     If you plan to use the `--llm` functionality with OpenAI, you need an API key.
     * Get your OpenAI API key from the [OpenAI Platform API Keys page](https://platform.openai.com/api-keys).
     * In the directory where you installed the `summarize-code-base` code (if you cloned it), or in your project's root directory where you might run the command from, create a file named `.env`.
@@ -242,7 +256,7 @@ The tool comes with built-in lists of common directories and files to ignore, de
 
 * `IGNORED_DIRS`: Contains directories like `node_modules`, `.git`, `dist`, build/cache folders for various languages/frameworks, virtual environments (`venv`, `env`), etc.
 * `IGNORED_FILES`: Contains specific file names like `package-lock.json`, `.env`, `.env.local`, and various lock files (`poetry.lock`, `yarn.lock`, `composer.lock`, etc.).
-* `NON_TEXT_EXTENSIONS`: Contains file extensions for binary files, images, archives, media, databases, fonts, etc.
+* `NON_TEXT_EXTENSIONS`: Contains file extensions for binary files, images, archives, media, databases, fonts, etc. (Note: PDF files are now processed using Docling or PyPDF2 if available)
 
 These lists are quite comprehensive and cover many typical project setups.
 
@@ -261,6 +275,33 @@ Contributions are welcome! If you have suggestions for improvements, bug fixes, 
 7.  Commit your changes and push to your fork.
 8.  Create a pull request to the original repository.
 
+## 📄 PDF Processing
+
+The tool now supports scanning PDF files using [Docling](https://github.com/docling-project/docling), a powerful document processing library. When a PDF file is encountered:
+
+1. The tool first checks if Docling is installed and available.
+2. If Docling is available, it uses it to extract text from the PDF, preserving structure and formatting.
+3. If Docling is not available or returns empty output, it automatically falls back to PyPDF2.
+4. If neither is available, it will display an error message with installation instructions.
+
+PDF processing capabilities include:
+* Advanced PDF understanding including page layout and reading order
+* Table structure extraction
+* Code block recognition
+* Formula extraction
+* OCR support for scanned PDFs
+
+To get the best results with PDF files:
+```bash
+# Install Docling (primary PDF processor)
+pip install docling
+
+# Install PyPDF2 (fallback PDF processor)
+pip install PyPDF2
+```
+
+The tool will automatically detect which PDF processing libraries are available and use the best option. If you see a message like "Docling not found. PDF scanning will be limited," you can install Docling to enable enhanced PDF processing capabilities.
+
 ## 🗺️ Future Enhancements / Roadmap
 
 Here are some planned features and potential future directions for the `summarize-code-base` tool:
@@ -270,6 +311,7 @@ Here are some planned features and potential future directions for the `summariz
 * **Multiple Output Formats:** Add options to output the summary or LLM response in different formats (e.g., JSON, pure Markdown file).
 * **Output to File:** Implement an option to save the generated report or LLM response directly to a specified file.
 * **Integrate with Local LLM (Concept):** Explore integration with local Large Language Models (LLMs).
+* **Enhance PDF Processing:** Add more options for PDF processing, such as controlling the level of detail or focusing on specific parts of PDFs.
 * **Integrate with Vision LLM for Images (Concept):** Investigate using local Vision-Language Models (VLMs) to analyze image files (currently ignored) and generate text descriptions.
 * **Progress Indicator:** For large projects, add a visual indicator to show the scanning progress.
 
