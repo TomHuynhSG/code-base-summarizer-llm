@@ -98,12 +98,15 @@ async function renderAndServe(markdownContent, projectName = 'Project Summary') 
             openBrowser(address);
         });
         server.on('error', (e) => {
-            console.error('Server error:', e.message);
+            // This typically handles errors *after* the server has started,
+            // like a problem with a specific request.
+            // For startup errors, the .listen callback or the try/catch around getAvailablePort is key.
+            console.error('Server runtime error:', e.message); 
         });
     } catch (error) {
-         console.error('Failed to start server:', error);
-         // Handle error appropriately, maybe exit
-         process.exit(1);
+         // This catch block handles errors from getAvailablePort or server.listen itself.
+         console.error('Failed to start web server:', error.message);
+         throw new Error(`Failed to start web server: ${error.message}`); // Re-throw to be caught by index.js
     }
 }
 

@@ -106,73 +106,51 @@ async function checkPdfToolsAvailability() {
 // Extract text from PDF files using Docling
 async function extractPdfText(pdfPath) {
     try {
-        console.log(`Attempting to extract text from PDF ${pdfPath} using Docling...`);
+        // console.log(`Attempting to extract text from PDF ${pdfPath} using Docling...`); // Reduced verbosity
         const command = `docling "${pdfPath}"`;
-        console.log(`Executing command: ${command}`);
+        // console.log(`Executing command: ${command}`); // Reduced verbosity
         const { stdout } = await execPromise(command);
-        console.log(`Docling output: ${stdout}`);
+        // console.log(`Docling output: ${stdout}`); // Reduced verbosity
         if (!stdout || stdout.trim() === '') {
-            console.log('Docling returned empty output, falling back to PyPDF2...');
+            console.warn(`Docling returned empty output for ${path.basename(pdfPath)}, falling back to PyPDF2...`);
             return await extractPdfTextFallback(pdfPath);
         }
         return stdout;
     } catch (error) {
-        console.error(`Error extracting text from PDF ${pdfPath}: ${error.message}`);
-        console.log('Falling back to PyPDF2...');
+        console.warn(`Docling failed for ${path.basename(pdfPath)}: ${error.message.split('\n')[0]}. Falling back to PyPDF2...`);
         return await extractPdfTextFallback(pdfPath);
     }
 }
 
-// Fallback PDF text extraction using a simple Python script
+// Fallback PDF text extraction using a static Python script
 async function extractPdfTextFallback(pdfPath) {
-    console.log(`Attempting to extract text from PDF ${pdfPath} using Python fallback...`);
-    
-    // Create a temporary Python script file
-    const tempScriptPath = path.join(path.dirname(pdfPath), '_temp_pdf_extract.py');
-    const pythonScript = `
-import sys
-try:
-    import PyPDF2
-    with open('${pdfPath.replace(/\\/g, '\\\\')}', 'rb') as file:
-        reader = PyPDF2.PdfReader(file)
-        text = ""
-        for page in reader.pages:
-            text += page.extract_text() + "\\n\\n"
-        print(text)
-except ImportError:
-    print("--- Error: PyPDF2 is not installed. Run 'pip install PyPDF2' to enable PDF scanning. ---")
-except Exception as e:
-    print("--- Error processing PDF: " + str(e) + " ---")
-`;
-    
+    // console.log(`Attempting to extract text from PDF ${pdfPath} using Python fallback...`); // Reduced verbosity
+    const scriptPath = path.join(__dirname, 'utils', 'extract_pdf_text.py'); // Assumes utils is in the same dir as this script
+
     try {
-        // Write the script to a temporary file
-        await fs.writeFile(tempScriptPath, pythonScript);
-        console.log(`Executing Python script from file: ${tempScriptPath}`);
-        
-        // Execute the script
-        const { stdout } = await execPromise(`python "${tempScriptPath}"`);
-        console.log(`Python script output: ${stdout}`);
-        
-        // Clean up the temporary file
-        try {
-            await fs.unlink(tempScriptPath);
-        } catch (cleanupError) {
-            console.warn(`Warning: Could not delete temporary script file: ${cleanupError.message}`);
+        // Check if the script exists
+        await fs.access(scriptPath); 
+    } catch (e) {
+        console.error(`Error: Python PDF extraction script not found at ${scriptPath}.`);
+        return `--- Error: Python PDF extraction script not found. Please ensure 'utils/extract_pdf_text.py' exists. ---`;
+    }
+    
+    const command = `python "${scriptPath}" "${pdfPath}"`;
+    try {
+        // console.log(`Executing Python script: ${command}`); // Reduced verbosity
+        const { stdout, stderr } = await execPromise(command);
+        if (stderr) {
+            // PyPDF2 script prints errors to stderr
+            console.warn(`PyPDF2 fallback for ${path.basename(pdfPath)} reported: ${stderr.trim()}`);
+            // Return stderr as it often contains the "--- Error..." message from the script
+            return stderr.trim(); 
         }
-        
-        return stdout || `--- No text extracted from PDF ${path.basename(pdfPath)}. The PDF may be empty or contain only images. ---`;
+        // console.log(`Python script output: ${stdout}`); // Reduced verbosity
+        return stdout || `--- No text extracted from PDF ${path.basename(pdfPath)} by PyPDF2. The PDF may be empty or contain only images. ---`;
     } catch (error) {
-        console.error(`Error executing Python script: ${error.message}`);
-        
-        // Clean up the temporary file even if there was an error
-        try {
-            await fs.unlink(tempScriptPath);
-        } catch (cleanupError) {
-            console.warn(`Warning: Could not delete temporary script file: ${cleanupError.message}`);
-        }
-        
-        return `--- Error extracting text from PDF ${path.basename(pdfPath)}. Python or required libraries may not be installed. ---`;
+        // This catch is for errors executing the python command itself (e.g. python not found)
+        console.error(`Error executing Python script for ${path.basename(pdfPath)}: ${error.message}`);
+        return `--- Error extracting text from PDF ${path.basename(pdfPath)} using Python. Python or PyPDF2 may not be installed correctly. ---`;
     }
 }
 
@@ -242,7 +220,8 @@ async function traverseDirectory(dirPath, rootPath, textFiles, structurePrefix =
     } catch (error) {
         // Log error but don't stop traversal
         const relativeDir = path.relative(rootPath, dirPath);
-        console.error(`Error reading directory ${relativeDir || '.'}: ${error.message}`);
+        const dirNameToDisplay = relativeDir || path.basename(rootPath) || 'root directory';
+        console.error(`Error reading directory '${dirNameToDisplay}': ${error.message}`);
     }
     return structureOutput;
 }
@@ -252,12 +231,8 @@ async function readFileContent(filePath, targetDir) {
     try {
         const ext = path.extname(filePath).toLowerCase();
         if (ext === '.pdf') {
-            // Try Docling first, then fallback to Python script
-            try {
-                return await extractPdfText(filePath);
-            } catch (error) {
-                return await extractPdfTextFallback(filePath);
-            }
+            // extractPdfText already handles its own fallback to extractPdfTextFallback
+            return await extractPdfText(filePath);
         } else if (ext === '.docx') {
             return await extractDocxText(filePath);
         } else if (ext === '.doc') {

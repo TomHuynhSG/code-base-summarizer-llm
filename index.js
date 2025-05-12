@@ -67,8 +67,8 @@ async function main() {
         .option('copy', {
              alias: 'c',
              type: 'boolean',
-             default: true,
-             description: 'Copy the generated summary to the clipboard (default is true unless --llm is used).'
+             // No explicit default here; handled in logic below based on --llm
+             description: 'Copy the generated summary to the clipboard. If --llm is used, this defaults to false. Otherwise, it defaults to true.'
         })
         .demandCommand(1, 'You must provide the directory path.')
         .help('h').alias('h', 'help')
@@ -131,8 +131,15 @@ async function main() {
         console.log('\n' + summaryString); // Print the summary
 
         // Handle clipboard copying
-        // By default, copy is true, unless LLM is used, then copy is false by default, but can be forced with --copy
-        const shouldCopy = argv.copy || (!argv.llm && argv.copy === undefined); // Copy if --copy is true, OR if --llm is false and --copy was not explicitly set to false
+        // Determine if the summary should be copied to the clipboard
+        let shouldCopy;
+        if (argv.llm) {
+            // With --llm, copy only if --copy is explicitly true. Defaults to false.
+            shouldCopy = argv.copy === true;
+        } else {
+            // Without --llm, copy unless --no-copy is explicitly given. Defaults to true.
+            shouldCopy = argv.copy !== false; // True if argv.copy is true or undefined
+        }
 
         if (shouldCopy && clipboardy) {
             try {
