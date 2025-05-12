@@ -17,7 +17,8 @@ A powerful command-line interface (CLI) tool designed to quickly scan a project 
 * **Intelligent Filtering:** Automatically ignores common directories (`node_modules`, `.git`, `dist`, build/cache folders, virtual environments, etc.) and specific noisy files (`package-lock.json`, `.env`, lock files, etc.).
 * **Binary/Non-Text Exclusion:** Skips binary files, images, archives, media, and other non-text formats (unless specific parsers are available, like for PDF and Word documents).
 * **PDF Scanning:** Extracts text from PDF files using the `pdf-parse` Node.js library.
-* **Word Document Scanning:** Extracts text from Microsoft Word documents (`.docx` using `mammoth` and `.doc` using `doc-parser`).
+* **Word Document Scanning (.docx):** Extracts text from modern Microsoft Word documents (`.docx`) using the `mammoth` library.
+* **YouTube Transcript Fetching:** Automatically detects YouTube links in `.txt` files, fetches the video transcript (without timestamps), and includes it in the summary directly after the link.
 * **Optional LLM Integration:** Pass the generated summary directly to an OpenAI-compatible LLM API for automated analysis using the `--llm` flag.
 * **Customizable Prompting:** Use a template file (`--prompt`) to control the instructions given to the LLM, injecting the project summary using a special tag (`{{SUMMARY}}`).
 * **Configurable LLM Settings:** Easily adjust the LLM `model` and `temperature` via command-line options.
@@ -130,7 +131,6 @@ Project Code Summarizer for 'my-project' starts...
 --- Section 1: Folder Structure ---
 my-project
 ├── documents
-│   ├── legacy_document.doc
 │   ├── report.docx
 │   └── manual.pdf
 ├── mobile_app
@@ -147,12 +147,7 @@ my-project
     └── utils
         └── helpers.js
 
---- Section 2: File Contents (9 files) ---
-
---- File: documents/legacy_document.doc ---
-This is content from an older .doc file.
-The tool can also parse these.
---- End of File: documents/legacy_document.doc ---
+--- Section 2: File Contents (8 files) ---
 
 --- File: documents/report.docx ---
 This is the content of the Word document.
@@ -318,14 +313,11 @@ The tool processes PDF files using the [pdf-parse](https://www.npmjs.com/package
 
 When a PDF file is encountered, `pdf-parse` attempts to extract its text content. The extracted text is included in the summary report.
 
-### Word Document Processing
+### Word Document Processing (.docx)
 
-The tool supports scanning Microsoft Word documents using Node.js libraries:
+The tool supports scanning modern Microsoft Word documents (`.docx` files). Text is extracted using the [mammoth](https://www.npmjs.com/package/mammoth) Node.js library. This library is included as a project dependency and installed automatically when you run `npm install`. No separate external tool installation is required for `.docx` handling.
 
-*   **`.docx` files:** Text is extracted using the `mammoth` library.
-*   **`.doc` files (Legacy Word Format):** Text is extracted using the `doc-parser` library.
-
-Both `mammoth` and `doc-parser` are included as project dependencies in `package.json` and will be installed automatically when you run `npm install`. No external tools are required for Word document processing anymore. Note that the reliability of `.doc` parsing might vary compared to `.docx`.
+Legacy `.doc` files are no longer supported.
 
 ## 🗺️ Future Enhancements / Roadmap
 

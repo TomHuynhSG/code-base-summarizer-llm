@@ -1,218 +1,163 @@
 #!/usr/bin/env node
-/**
- * Main entry point for the Codebase Summarizer CLI tool.
- * Parses command-line arguments, generates a project summary,
- * and either prints/copies it or sends it to an LLM for analysis.
- */
 
-// --- Core Node.js Modules ---
 const path = require('path');
-const fs = require('fs').promises; // Used for initial directory validation
+const yargs = require('yargs/yargs');
+const { hideBin } = require('yargs/helpers');
+const dotenv = require('dotenv');
+const fs = require('fs').promises; // Need fs here for initial dir validation
 
-// --- External Dependencies ---
-const yargs = require('yargs/yargs'); // For command-line argument parsing
-const { hideBin } = require('yargs/helpers'); // Helper for yargs
-const dotenv = require('dotenv'); // For loading environment variables (like API keys)
+// Import core summary generator
+const { generateProjectSummary } = require('./project_summary');
 
-// --- Internal Modules ---
-const { generateProjectSummary } = require('./project_summary'); // Core summary generation logic
-const { processWithLLM } = require('./llm_processor'); // Handles interaction with LLM API
-const { renderAndServe } = require('./web_renderer'); // Renders LLM response as HTML and serves it
+// Import new LLM and rendering modules
+const { processWithLLM } = require('./llm_processor');
+const { renderAndServe } = require('./web_renderer');
 
-// --- Load Environment Variables ---
-// Loads variables from a .env file into process.env (e.g., OPENAI_API_KEY)
+// Load environment variables from .env file
 dotenv.config();
 
-// --- Dynamic Import for Optional Dependency ---
-// clipboardy is used to copy text to the system clipboard.
-// It's imported dynamically because it's an ES module and might not be needed
-// if the user only uses the --llm feature without --copy.
+// Dynamically import clipboardy (still needed for non-LLM mode or --copy)
 let clipboardy;
-
-/**
- * Asynchronously loads the clipboardy library.
- * Handles potential errors if the library is not installed or fails to load.
- */
 async function loadClipboardy() {
     try {
-        // Dynamically import the ES module
         clipboardy = (await import('clipboardy')).default;
     } catch (err) {
         console.error("Warning: Failed to load clipboardy. Clipboard functionality will be disabled.", err.message);
-        clipboardy = null; // Ensure clipboardy is null if loading failed
+        clipboardy = null;
     }
 }
 
-/**
- * Main execution function for the CLI tool.
- */
-async function main() {
-    // Attempt to load clipboardy early, before argument parsing
-    await loadClipboardy();
 
-    // --- Command-Line Argument Parsing ---
+async function main() {
+    await loadClipboardy(); // Load clipboardy before parsing args if possible
+
     const argv = await yargs(hideBin(process.argv))
         .usage('Usage: $0 <directory_path> [options]')
-        // Define the default command structure: requires a directory path
         .command('$0 <directory>', 'Summarize the codebase in the specified directory.', (yargs) => {
             yargs.positional('directory', {
-                // Define the positional 'directory' argument
                 describe: 'Path to the project root directory',
                 type: 'string',
-                normalize: true // Automatically normalize the path (e.g., resolve '..')
+                normalize: true
             });
         })
-        // --- Define CLI Options ---
         .option('llm', {
-            alias: 'L', // Short flag -L
+            alias: 'L',
             type: 'boolean',
-            default: false, // Defaults to not using LLM
+            default: false,
             description: 'Pass the summary output to an LLM for analysis and open in browser.'
         })
         .option('prompt', {
-            alias: 'p', // Short flag -p
+            alias: 'p',
             type: 'string',
-            default: 'prompt_template.txt', // Default prompt file name
+            default: 'prompt_template.txt',
             description: 'Path to the prompt template file for LLM processing.'
         })
         .option('model', {
-            alias: 'm', // Short flag -m
+            alias: 'm',
             type: 'string',
-            default: 'o4-mini', // Default model (consider updating based on current best/available)
+            default: 'o4-mini', // Or 'o4-mini', 'gpt-4.1-mini' or 'gpt-4o' or another preferred model
             description: 'OpenAI model name to use for LLM processing.'
         })
         .option('temperature', {
-            alias: 't', // Short flag -t
+            alias: 't',
             type: 'number',
-            default: 1, // Default temperature
+            default: 1,
             description: 'Temperature setting for the LLM (0.0 to 2.0).'
         })
         .option('copy', {
-             alias: 'c', // Short flag -c
+             alias: 'c',
              type: 'boolean',
-             // Default value is determined dynamically later based on whether --llm is used
+             // No explicit default here; handled in logic below based on --llm
              description: 'Copy the generated summary to the clipboard. If --llm is used, this defaults to false. Otherwise, it defaults to true.'
         })
-        // --- Finalize Argument Parsing ---
-        .demandCommand(1, 'You must provide the directory path.') // Ensure the directory path is provided
-        .help('h').alias('h', 'help') // Enable help option
-        .epilog('Generated by summarize-code-base') // Footer message for help output
-        .argv; // Parse the arguments
+        .demandCommand(1, 'You must provide the directory path.')
+        .help('h').alias('h', 'help')
+        .epilog('Generated by summarize-code-base')
+        .argv;
 
-    // --- Prepare Directory and Project Name ---
-    const targetDir = path.resolve(argv.directory); // Get absolute path
-    const projectName = path.basename(targetDir); // Extract project name from path
+    const targetDir = path.resolve(argv.directory);
+    const projectName = path.basename(targetDir);
 
     // --- Print Start Message ---
     console.log(`Project Code Summarizer for '${projectName}' starts...`);
 
-    // --- 1. Validate Target Directory ---
+    // 1. Validate directory
     try {
-        const stats = await fs.stat(targetDir); // Get file system stats for the path
-        if (!stats.isDirectory()) { // Check if it's actually a directory
-            console.error(`\n❌ Error: Provided path is not a directory: ${targetDir}`);
-            process.exit(1); // Exit if not a directory
+        const stats = await fs.stat(targetDir);
+        if (!stats.isDirectory()) {
+            console.error(`\nError: Provided path is not a directory: ${targetDir}`);
+            process.exit(1);
         }
     } catch (error) {
-        // Handle errors during directory access (e.g., path doesn't exist)
-        if (error.code === 'ENOENT') {
-            console.error(`\n❌ Error: Directory not found: ${targetDir}`);
-        } else {
-            console.error(`\n❌ Error accessing directory: ${error.message}`);
-        }
-        process.exit(1); // Exit on error
+        if (error.code === 'ENOENT') console.error(`\nError: Directory not found: ${targetDir}`);
+        else console.error(`\nError accessing directory: ${error.message}`);
+        process.exit(1);
     }
 
-    // --- 2. Generate the Project Summary ---
-    // Calls the core logic from project_summary.js
-    console.log(`🔍 Scanning directory: ${targetDir}...`);
+    // 2. Generate the project summary string
     const summaryString = await generateProjectSummary(targetDir);
-    console.log(`✅ Directory scan complete.`);
 
-    // --- 3. Process Output Based on Flags ---
+    // --- Process based on flags ---
     if (argv.llm) {
-        // --- LLM Processing Branch ---
-        console.log(`🤖 Processing summary with LLM (Model: ${argv.model})...`);
-
-        // Check for API key
         const apiKey = process.env.OPENAI_API_KEY;
         if (!apiKey) {
-            // Provide clear instructions if API key is missing
-            console.error("\n❌ Error: OPENAI_API_KEY is not set in the environment variables.");
-            console.error("   Please create a '.env' file in the project root or execution directory");
-            console.error("   with the following content:");
-            console.error("   OPENAI_API_KEY=YOUR_ACTUAL_API_KEY");
-            console.error("   You can get your key from https://platform.openai.com/api-keys");
-            process.exit(1); // Exit if no API key
+            console.error("\nError: OPENAI_API_KEY is not set.");
+            console.error("Please create a .env file in the project root with OPENAI_API_KEY=YOUR_KEY");
+            console.error("You can get your key from https://platform.openai.com/api-keys");
+            process.exit(1);
         }
 
         try {
-            // Call the LLM processing function
             const llmResponse = await processWithLLM(summaryString, {
                 promptTemplatePath: argv.prompt,
                 model: argv.model,
                 temperature: argv.temperature,
-                apiKey: apiKey, // Pass the loaded API key
+                apiKey: apiKey, // Pass the key from environment
             });
 
             if (llmResponse) {
-                // If response received, render it in the browser
-                console.log(`🌐 Rendering LLM response...`);
                 await renderAndServe(llmResponse, projectName);
-                console.log(`✨ LLM response rendered and served.`);
             } else {
-                 // Handle cases where LLM processing might not return a response
-                 console.log("\n⚠️ LLM processing completed, but no response was received or rendered.");
+                 console.log("\nLLM processing completed, but no response was received or rendered.");
             }
 
         } catch (error) {
-            // Catch errors during LLM processing or rendering
-            console.error("\n❌ An error occurred during LLM processing or rendering:", error.message);
-            // Optionally log the full error for debugging: console.error(error);
-            process.exit(1); // Exit on error
+            console.error("\nAn error occurred during LLM processing or rendering:", error.message);
+            process.exit(1);
         }
 
     } else {
-        // --- Default Branch (No --llm flag) ---
-        // Print the generated summary to the console
-        console.log('\n--- Generated Project Summary ---');
-        console.log(summaryString); // Print the full summary
-        console.log('--- End of Summary ---');
-    }
+        // Default behavior: Print to console and copy to clipboard
+        console.log('\n' + summaryString); // Print the summary
 
-    // --- 4. Handle Clipboard Copying (Applies to both branches if --copy is used) ---
-    // Determine the effective value of the 'copy' flag based on 'llm' flag presence
-    let shouldCopy;
-    if (argv.llm) {
-        // With --llm, copy only if --copy is explicitly true. Defaults to false.
-        shouldCopy = argv.copy === true;
-    } else {
-        // Without --llm, copy unless --copy is explicitly false. Defaults to true.
-        shouldCopy = argv.copy !== false; // True if argv.copy is true or undefined/null
-    }
+        // Handle clipboard copying
+        // Determine if the summary should be copied to the clipboard
+        let shouldCopy;
+        if (argv.llm) {
+            // With --llm, copy only if --copy is explicitly true. Defaults to false.
+            shouldCopy = argv.copy === true;
+        } else {
+            // Without --llm, copy unless --no-copy is explicitly given. Defaults to true.
+            shouldCopy = argv.copy !== false; // True if argv.copy is true or undefined
+        }
 
-    // Attempt to copy if required and clipboardy is available
-    if (shouldCopy) {
-        if (clipboardy) {
+        if (shouldCopy && clipboardy) {
             try {
                 await clipboardy.write(summaryString);
                 console.log('\n✅ Summary copied to clipboard!');
             } catch (error) {
                 console.error('\n❌ Failed to copy summary to clipboard:', error.message);
             }
-        } else {
-            // Inform user if copying was requested but clipboardy failed to load
-            console.log('\n⚠️ Clipboard copy requested, but clipboard functionality is not available.');
+        } else if (shouldCopy && !clipboardy) {
+            console.log('\n⚠️ Clipboard functionality not available.')
         }
     }
 
-    // --- Print End Message ---
-    console.log(`\nProject Code Summarizer for '${projectName}' finished.`);
+    console.log(`\nProject Code Summarizer for '${projectName}' ends.`); // Final message
 }
 
-// --- Script Execution ---
-// Execute the main function and catch any top-level unhandled errors
+// Run main
 main().catch(error => {
-    console.error('\n❌ An unexpected error occurred during execution:', error);
-    process.exit(1); // Exit with a non-zero code to indicate failure
+    console.error('\nAn unexpected error occurred:', error);
+    process.exit(1);
 });
