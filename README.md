@@ -15,8 +15,9 @@ A powerful command-line interface (CLI) tool designed to quickly scan a project 
 * **Project Structure:** Generates a visual tree representation of the project directory.
 * **Text File Contents:** Includes the full content of identifiable text files within the project.
 * **Intelligent Filtering:** Automatically ignores common directories (`node_modules`, `.git`, `dist`, build/cache folders, virtual environments, etc.) and specific noisy files (`package-lock.json`, `.env`, lock files, etc.).
-* **Binary/Non-Text Exclusion:** Skips binary files, images, archives, media, and other non-text formats.
-* **PDF Scanning:** Extracts text from PDF files using Docling for comprehensive codebase analysis.
+* **Binary/Non-Text Exclusion:** Skips binary files, images, archives, media, and other non-text formats (unless specific parsers are available, like for PDF and Word documents).
+* **PDF Scanning:** Extracts text from PDF files using Docling (or PyPDF2 fallback) for comprehensive codebase analysis.
+* **Word Document Scanning:** Extracts text from Microsoft Word documents (`.docx` and `.doc` files).
 * **Optional LLM Integration:** Pass the generated summary directly to an OpenAI-compatible LLM API for automated analysis using the `--llm` flag.
 * **Customizable Prompting:** Use a template file (`--prompt`) to control the instructions given to the LLM, injecting the project summary using a special tag (`{{SUMMARY}}`).
 * **Configurable LLM Settings:** Easily adjust the LLM `model` and `temperature` via command-line options.
@@ -275,7 +276,9 @@ Contributions are welcome! If you have suggestions for improvements, bug fixes, 
 7.  Commit your changes and push to your fork.
 8.  Create a pull request to the original repository.
 
-## 📄 PDF Processing
+## 📄 Document Processing
+
+### PDF Processing
 
 The tool now supports scanning PDF files using [Docling](https://github.com/docling-project/docling), a powerful document processing library. When a PDF file is encountered:
 
@@ -301,6 +304,19 @@ pip install PyPDF2
 ```
 
 The tool will automatically detect which PDF processing libraries are available and use the best option. If you see a message like "Docling not found. PDF scanning will be limited," you can install Docling to enable enhanced PDF processing capabilities.
+
+### Word Document Processing
+
+The tool now supports scanning Microsoft Word documents:
+
+*   **`.docx` files:** Text is extracted using the `mammoth` library, which is specifically designed for converting `.docx` documents to plain text. This library is included as a project dependency.
+*   **`.doc` files (Legacy Word Format):** Text is extracted using the `textract` library. This library is also included as a project dependency.
+    *   **Important Note for `.doc` files:** `textract` often relies on external command-line tools to process older `.doc` files. You may need to install `antiword` or `catdoc` on your system.
+        *   On macOS (using Homebrew): `brew install antiword`
+        *   On Debian/Ubuntu: `sudo apt-get install antiword` or `sudo apt-get install catdoc`
+        *   If text extraction from `.doc` files fails or returns an error, please ensure one of these helper tools is installed and accessible in your system's PATH.
+
+The necessary Node.js libraries (`mammoth` and `textract`) are listed in `package.json` and will be installed automatically when you run `npm install` in the project directory.
 
 ## 🗺️ Future Enhancements / Roadmap
 
