@@ -142,16 +142,55 @@ Project Code Summarizer for 'my-project' starts...
 
 --- Section 1: Folder Structure ---
 my-project
+├── documents
+│   ├── legacy_document.doc
+│   ├── report.docx
+│   └── manual.pdf
+├── mobile_app
+│   └── main_view.swift
+├── notes.txt
 ├── package-lock.json  # Ignored file name, but shown in structure
 ├── package.json
 ├── project_summary.js
+├── scripts
+│   └── data_processor.py
 └── src
     ├── components
     │   └── Button.js
     └── utils
         └── helpers.js
 
---- Section 2: File Contents (3 files) ---
+--- Section 2: File Contents (9 files) ---
+
+--- File: documents/legacy_document.doc ---
+This is content from an older .doc file.
+The tool can also parse these.
+--- End of File: documents/legacy_document.doc ---
+
+--- File: documents/report.docx ---
+This is the content of the Word document.
+It might contain various text elements.
+--- End of File: documents/report.docx ---
+
+--- File: documents/manual.pdf ---
+This is the extracted text from the PDF.
+PDFs can have complex layouts, but we get the text.
+--- End of File: documents/manual.pdf ---
+
+--- File: mobile_app/main_view.swift ---
+import SwiftUI
+
+struct MainView: View {
+    var body: some View {
+        Text("Hello, Swift!")
+    }
+}
+--- End of File: mobile_app/main_view.swift ---
+
+--- File: notes.txt ---
+This is a simple text file.
+It contains some notes for the project.
+--- End of File: notes.txt ---
 
 --- File: package.json ---
 {
@@ -168,6 +207,14 @@ my-project
 const fs = require('fs').promises;
 ...
 --- End of File: project_summary.js ---
+
+--- File: scripts/data_processor.py ---
+def process_data(data):
+    # Imagine complex data processing here
+    return data.upper()
+
+print(process_data("sample input"))
+--- End of File: scripts/data_processor.py ---
 
 --- File: src/components/Button.js ---
 import React from 'react';
