@@ -68,7 +68,13 @@ This tool is a Node.js CLI application. You will need Node.js installed on your 
     **Option A: Install from local directory (recommended):**
     If you have cloned or downloaded this repository, navigate to the project directory and run:
     ```bash
+    # First, install dependencies
+    npm install
+    
+    # Then, install the package globally
     npm install -g .
+    # OR use npm link for development
+    npm link
     ```
     
     **Option B: Install from npm registry:**
@@ -80,7 +86,12 @@ This tool is a Node.js CLI application. You will need Node.js installed on your 
     **Note for macOS/Linux users:** You might need to use `sudo` if you encounter permission errors:
     ```bash
     sudo npm install -g .
+    # OR
+    sudo npm link
     ```
+    
+    **Troubleshooting:**
+    If you encounter a "Cannot find module" error when running the `summarize` command, make sure you've installed the dependencies first with `npm install` before installing the package globally.
 
 3.  **Setup for LLM Integration (Optional):**
     If you plan to use the `--llm` functionality with OpenAI, you need an API key.
