@@ -4,6 +4,8 @@ const fs = require('fs').promises;
 const path = require('path');
 const { exec } = require('child_process');
 const util = require('util');
+const mammoth = require('mammoth');
+const textract = require('textract');
 // Removed yargs and hideBin - moved to index.js
 // Removed clipboardy import - moved to index.js
 // Removed main execution logic - moved to index.js
@@ -176,10 +178,35 @@ except Exception as e:
 
 function isTextFile(filePath) {
     const ext = path.extname(filePath).toLowerCase();
-    if (ext === '.pdf') {
-        return true; // Consider PDFs as text files now
+    if (ext === '.pdf' || ext === '.docx' || ext === '.doc') {
+        return true; // Consider PDFs, DOCX, and DOC as text files now
     }
     return ext === '' || !NON_TEXT_EXTENSIONS.has(ext);
+}
+
+async function extractDocText(filePath) {
+    return new Promise((resolve, reject) => {
+        console.log(`Attempting to extract text from DOC ${filePath} using textract...`);
+        textract.fromFileWithPath(filePath, { preserveLineBreaks: true }, (error, text) => {
+            if (error) {
+                console.error(`Error extracting text from DOC ${filePath} using textract: ${error.message}`);
+                resolve(`--- Error extracting text from DOC ${path.basename(filePath)}. Ensure antiword or catdoc is installed. ---`);
+            } else {
+                resolve(text || `--- No text extracted from DOC ${path.basename(filePath)}. ---`);
+            }
+        });
+    });
+}
+
+async function extractDocxText(filePath) {
+    try {
+        console.log(`Attempting to extract text from DOCX ${filePath} using mammoth...`);
+        const result = await mammoth.extractRawText({ path: filePath });
+        return result.value || `--- No text extracted from DOCX ${path.basename(filePath)}. ---`;
+    } catch (error) {
+        console.error(`Error extracting text from DOCX ${filePath}: ${error.message}`);
+        return `--- Error extracting text from DOCX ${path.basename(filePath)}. ---`;
+    }
 }
 
 async function traverseDirectory(dirPath, rootPath, textFiles, structurePrefix = '') {
@@ -231,6 +258,10 @@ async function readFileContent(filePath, targetDir) {
             } catch (error) {
                 return await extractPdfTextFallback(filePath);
             }
+        } else if (ext === '.docx') {
+            return await extractDocxText(filePath);
+        } else if (ext === '.doc') {
+            return await extractDocText(filePath);
         }
         return await fs.readFile(filePath, 'utf8');
     } catch (error) {
