@@ -181,7 +181,8 @@ async function readFileContent(filePath, targetDir) {
         let content = await fsPromises.readFile(filePath, 'utf8');
 
         if (ext === '.txt') {
-            const youtubeUrlRegex = /(https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11}))/g;
+            // Updated regex to make protocol and www. optional
+            const youtubeUrlRegex = /((?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11}))/g;
             let match;
             const promises = [];
             const replacements = {}; // Store replacements to avoid modifying string during iteration
