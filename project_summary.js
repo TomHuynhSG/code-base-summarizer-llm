@@ -36,7 +36,7 @@ const IGNORED_DIRS = new Set([
 ]);
 const IGNORED_FILES = new Set([
     'package-lock.json', // Node.js
-    '.env', '.env.local', '.env.development', '.env.production', // More specific environment variable files
+    '.env.local', '.env.development', '.env.production', // More specific environment variable files
     'poetry.lock', 'Pipfile.lock', // Python
     'yarn.lock', 'pnpm-lock.yaml', // Node.js
     'composer.lock', // PHP
