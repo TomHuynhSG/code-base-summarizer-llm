@@ -261,6 +261,13 @@ You can customize the LLM processing using the following options with the `--llm
     summarize . --no-copy   # Don't copy to clipboard (only print to console)
     ```
 
+### Other Options
+
+* `--folder-structure-only` (Alias: `-s`): Output only the folder structure of the project, skipping file contents entirely. This is useful for getting a quick overview of the project's layout.
+    ```bash
+    summarize . --folder-structure-only
+    ```
+
 You can combine these options:
 
 ```bash

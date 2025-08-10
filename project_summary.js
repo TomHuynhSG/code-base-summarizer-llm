@@ -238,7 +238,8 @@ async function readFileContent(filePath, targetDir) {
 }
 
 // --- Core Summary Generation Function ---
-async function generateProjectSummary(targetDir) {
+async function generateProjectSummary(targetDir, options = {}) {
+    const { folderStructureOnly = false } = options;
     // Removed checkPdfToolsAvailability call
     const projectName = path.basename(targetDir);
     let outputBuffer = ''; // Initialize buffer for report content
@@ -249,6 +250,10 @@ async function generateProjectSummary(targetDir) {
     outputBuffer += `${projectName}\n`;
     const structure = await traverseDirectory(targetDir, targetDir, textFilesFound);
     outputBuffer += structure;
+
+    if (folderStructureOnly) {
+        return outputBuffer;
+    }
 
     // 2. File Contents
     outputBuffer += `\n--- Section 2: File Contents (${textFilesFound.length} files) ---\n`;
