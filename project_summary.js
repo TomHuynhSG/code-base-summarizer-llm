@@ -7,7 +7,7 @@ const { exec } = require('child_process');
 const util = require('util');
 const mammoth = require('mammoth');
 const pdfParse = require('pdf-parse'); // Added pdf-parse
-const { YoutubeTranscript } = require('youtube-transcript'); // Added for YouTube transcripts
+const { YoutubeTranscript } = require('youtube-transcript-plus'); // Added for YouTube transcripts
 // Removed libreoffice-convert require
 // Removed textract import as it's not used for .doc anymore
 // Removed yargs and hideBin - moved to index.js
@@ -197,12 +197,43 @@ async function readFileContent(filePath, targetDir) {
                             try {
                                 console.log(`Fetching transcript for YouTube video: ${videoId}`);
                                 const transcript = await YoutubeTranscript.fetchTranscript(videoId);
-                                const transcriptText = transcript.map(item => item.text).join(' ');
-                                replacements[url] = `${url}\n--- YouTube Transcript Start ---\n${transcriptText}\n--- YouTube Transcript End ---`;
-                                console.log(`Successfully fetched and processed transcript for ${videoId}`);
+                                
+                                // Check if transcript is valid and has content
+                                if (transcript && Array.isArray(transcript) && transcript.length > 0) {
+                                    // Extract text from transcript items
+                                    const transcriptText = transcript
+                                        .map(item => {
+                                            // Handle different possible property names
+                                            return item.text || item.content || item.snippet || '';
+                                        })
+                                        .filter(text => text.trim() !== '') // Remove empty entries
+                                        .join(' ');
+                                    
+                                    if (transcriptText.trim()) {
+                                        replacements[url] = `${url}\n--- YouTube Transcript Start ---\n${transcriptText}\n--- YouTube Transcript End ---`;
+                                        console.log(`Successfully fetched and processed transcript for ${videoId} (${transcriptText.length} characters)`);
+                                    } else {
+                                        console.warn(`Transcript for ${videoId} was empty or contained no text`);
+                                        replacements[url] = `${url}\n--- YouTube Transcript Not Available (Empty transcript returned) ---`;
+                                    }
+                                } else {
+                                    console.warn(`No transcript available for video ${videoId} (empty response)`);
+                                    replacements[url] = `${url}\n--- YouTube Transcript Not Available (No transcript found) ---`;
+                                }
                             } catch (fetchError) {
                                 console.warn(`Could not fetch transcript for ${url}: ${fetchError.message}`);
-                                replacements[url] = `${url}\n--- YouTube Transcript Not Available ---`;
+                                // Provide more specific error messages
+                                let errorMsg = 'Not Available';
+                                if (fetchError.message.includes('disabled')) {
+                                    errorMsg = 'Not Available (Transcripts disabled for this video)';
+                                } else if (fetchError.message.includes('private')) {
+                                    errorMsg = 'Not Available (Private video)';
+                                } else if (fetchError.message.includes('not found')) {
+                                    errorMsg = 'Not Available (Video not found)';
+                                } else {
+                                    errorMsg = `Not Available (${fetchError.message})`;
+                                }
+                                replacements[url] = `${url}\n--- YouTube Transcript ${errorMsg} ---`;
                             }
                         })()
                     );
