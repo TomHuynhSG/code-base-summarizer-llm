@@ -67,7 +67,8 @@ const NON_TEXT_EXTENSIONS = new Set([
     '.xcodeproj', '.xcworkspace', // Xcode project files
     '.apk', // Android package files
     '.ipa', // iOS package files
-    '.doc' // Removed .doc from the list
+    '.doc', // Removed .doc from the list
+    '.war'
 ]);
 
 // --- Helper Functions ---
